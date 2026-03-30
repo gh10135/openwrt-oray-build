@@ -8,15 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout plugin source
+      - name: Checkout plugin
         uses: actions/checkout@v4
         with:
           repository: OrayOS/OpenOray
           path: OpenOray
 
-      - name: Download OpenWrt SDK (aarch64_generic)
+      - name: Download OpenWrt SDK (rockchip/armv8)
         run: |
-          wget -q https://downloads.openwrt.org/releases/24.10/targets/aarch64_generic/generic/openwrt-sdk-24.10-aarch64_generic-generic_gcc13.3.0_musl_eabi.Linux-x86_64.tar.xz
+          wget -q https://downloads.openwrt.org/releases/24.10.5/targets/rockchip/armv8/openwrt-sdk-24.10.5-rockchip-armv8_gcc13.3.0_musl_eabi.Linux-x86_64.tar.xz
           tar -xf openwrt-sdk-*.tar.xz
           SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-*" | head -1)
           echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
@@ -49,9 +49,9 @@ jobs:
           echo "ipk_path=$IPK" >> $GITHUB_OUTPUT
           echo "Found: $IPK"
 
-      - name: Upload ipk artifact
+      - name: Upload artifact
         if: steps.find_ipk.outputs.ipk_path != ''
         uses: actions/upload-artifact@v4
         with:
-          name: luci-app-phtunnel-aarch64-ipk
+          name: luci-app-phtunnel-r2s-ipk
           path: ${{ steps.find_ipk.outputs.ipk_path }}
