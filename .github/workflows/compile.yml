@@ -54,15 +54,10 @@ jobs:
           cd ${{ env.SDK_DIR }}
           make -j$(nproc) package/luci-app-phtunnel/compile V=s 2>&1 | tee build.log
 
-      - name: Find ipk
-        id: find_ipk
-        run: |
-          IPK=$(find . -name "*phtunnel*.ipk" -o -name "luci-app-phtunnel*.ipk" 2>/dev/null)
-          echo "ipk_path=$IPK" >> $GITHUB_OUTPUT
-          echo "Found: $IPK"
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: openwrt-ipk-packages
-          path: ${{ env.SDK_DIR }}/bin/packages/aarch64_generic/**/*.ipk
+          path: |
+            ${{ env.SDK_DIR }}/bin/packages/aarch64_generic/base/luci-app-phtunnel*.ipk
+            ${{ env.SDK_DIR }}/bin/targets/rockchip/armv8/packages/phtunnel*.ipk
