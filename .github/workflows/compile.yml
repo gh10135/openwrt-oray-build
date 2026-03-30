@@ -16,7 +16,7 @@ jobs:
 
       - name: Download OpenWrt SDK (aarch64_generic)
         run: |
-          wget -q https://downloads.openwrt.org/releases/23.05.3/targets/aarch64_generic/generic64/openwrt-sdk-23.05.3-aarch64_generic-generic64_gcc12.3.0_musl_eabi.Linux-x86_64.tar.xz
+          wget -q https://downloads.openwrt.org/releases/24.10/targets/aarch64_generic/generic/openwrt-sdk-24.10-aarch64_generic-generic_gcc13.3.0_musl_eabi.Linux-x86_64.tar.xz
           tar -xf openwrt-sdk-*.tar.xz
           SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-*" | head -1)
           echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
