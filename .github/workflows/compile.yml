@@ -16,7 +16,7 @@ jobs:
 
       - name: Download OpenWrt SDK (rockchip/armv8)
         run: |
-          wget -q https://downloads.openwrt.org/releases/24.10.5/targets/rockchip/armv8/openwrt-sdk-24.10.5-rockchip-armv8_gcc13.3.0_musl_eabi.Linux-x86_64.tar.xz
+          wget -q https://downloads.openwrt.org/releases/24.10.5/targets/rockchip/armv8/openwrt-sdk-24.10.5-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst
           tar -xf openwrt-sdk-*.tar.xz
           SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-*" | head -1)
           echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
