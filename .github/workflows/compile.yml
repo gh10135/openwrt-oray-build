@@ -1,0 +1,57 @@
+name: Compile luci-app-phtunnel (R2S)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout plugin source
+        uses: actions/checkout@v4
+        with:
+          repository: OrayOS/OpenOray
+          path: OpenOray
+
+      - name: Download OpenWrt SDK (aarch64_generic)
+        run: |
+          wget -q https://downloads.openwrt.org/releases/23.05.3/targets/aarch64_generic/generic64/openwrt-sdk-23.05.3-aarch64_generic-generic64_gcc12.3.0_musl_eabi.Linux-x86_64.tar.xz
+          tar -xf openwrt-sdk-*.tar.xz
+          SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-*" | head -1)
+          echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
+
+      - name: Copy plugin into SDK
+        run: |
+          mkdir -p ${{ env.SDK_DIR }}/package/luci-app-phtunnel
+          cp -r OpenOray/luci-app-phtunnel ${{ env.SDK_DIR }}/package/
+
+      - name: Update feeds
+        run: |
+          cd ${{ env.SDK_DIR }}
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Configure
+        run: |
+          cd ${{ env.SDK_DIR }}
+          make defconfig
+
+      - name: Compile
+        run: |
+          cd ${{ env.SDK_DIR }}
+          make -j$(nproc) package/luci-app-phtunnel/compile V=s 2>&1 | tee build.log
+
+      - name: Find ipk
+        id: find_ipk
+        run: |
+          IPK=$(find . -name "luci-app-phtunnel*.ipk" 2>/dev/null | head -1)
+          echo "ipk_path=$IPK" >> $GITHUB_OUTPUT
+          echo "Found: $IPK"
+
+      - name: Upload ipk artifact
+        if: steps.find_ipk.outputs.ipk_path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-app-phtunnel-aarch64-ipk
+          path: ${{ steps.find_ipk.outputs.ipk_path }}
