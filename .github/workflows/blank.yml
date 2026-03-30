@@ -2,21 +2,10 @@ name: Build OpenOray IPK
 
 on:
   workflow_dispatch:
-    inputs:
-      package:
-        description: '选择要编译的包'
-        required: true
-        default: 'luci-app-phtunnel'
-        type: choice
-        options:
-          - luci-app-pgyvpn
-          - luci-app-phtunnel
-          - pgyvpn
-          - phtunnel
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # 改用 20.04，更稳定
+    runs-on: ubuntu-22.04
 
     steps:
     - name: 安装依赖
@@ -55,6 +44,12 @@ jobs:
         echo "CONFIG_PACKAGE_pgyvpn=m" >> .config
         make defconfig
 
+    - name: 安装 host 工具
+      run: |
+        cd openwrt
+        make tools/install -j$(nproc) || true
+        make toolchain/install -j$(nproc) || true
+
     - name: 下载依赖
       run: |
         cd openwrt
@@ -66,9 +61,8 @@ jobs:
         make package/openwrt-packages/OpenOray/compile V=s -j$(nproc) || \
         make package/openwrt-packages/OpenOray/compile V=s -j1
 
-    - name: 列出所有 IPK 文件
+    - name: 列出 IPK
       run: |
-        echo "=== 所有 .ipk 文件 ==="
         find openwrt/bin/packages -name "*.ipk" || echo "没有找到 IPK 文件"
 
     - name: 上传 IPK
