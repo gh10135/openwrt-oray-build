@@ -14,6 +14,11 @@ jobs:
           repository: OrayOS/OpenOray
           path: OpenOray
 
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pyelftools
+
       - name: Download OpenWrt SDK (rockchip/armv8)
         run: |
           wget -q https://downloads.openwrt.org/releases/24.10.5/targets/rockchip/armv8/openwrt-sdk-24.10.5-rockchip-armv8_gcc-13.3.0_musl.Linux-x86_64.tar.zst
@@ -21,10 +26,12 @@ jobs:
           SDK_DIR=$(find . -maxdepth 1 -type d -name "openwrt-sdk-*" | head -1)
           echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
 
-      - name: Copy plugin into SDK
+      - name: Copy plugin into SDK (including phtunnel dependency)
         run: |
           mkdir -p ${{ env.SDK_DIR }}/package/luci-app-phtunnel
+          mkdir -p ${{ env.SDK_DIR }}/package/phtunnel
           cp -r OpenOray/luci-app-phtunnel ${{ env.SDK_DIR }}/package/
+          cp -r OpenOray/phtunnel ${{ env.SDK_DIR }}/package/
 
       - name: Update feeds
         run: |
